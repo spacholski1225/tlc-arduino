@@ -16,17 +16,15 @@
 
 int diodes[] = { RED_L, YELLOW_L, GREEN_L, RED_U, YELLOW_U, GREEN_U, RED_B, YELLOW_B, GREEN_B, RED_R, YELLOW_R, GREEN_R };
 
-int diodesLength;
-
 void setup() 
 {
-  diodesLength = sizeof(diodes)/sizeof(*diodes);
+ 
 
   Serial.begin(9600);
   
   Serial.println("setup");
   setPinModes();
-  turnOnDiodes();
+  setStartParameters();
 }
 
 void loop() 
@@ -35,6 +33,8 @@ void loop()
 
 void setPinModes()
 {
+  int diodesLength = sizeof(diodes)/sizeof(*diodes);
+
   Serial.println(diodesLength);
   for(int i = 0; i < diodesLength; i++)
   {
@@ -44,11 +44,43 @@ void setPinModes()
   }
 }
 
-void turnOnDiodes()
-{  
-  for(int i = 0; i < diodesLength; i++)
+void turnOnRedDiode(int greenDiode, int yellowDiode, int redDiode)
+{
+  if(digitalRead(greenDiode) == HIGH)
   {
-    digitalWrite(diodes[i], HIGH);
-    delay(100);
+    digitalWrite(greenDiode, LOW);
+    delay(200);
   }
+  
+  if(digitalRead(yellowDiode) == LOW && digitalRead(redDiode) == LOW)
+  {
+    digitalWrite(yellowDiode, HIGH);
+    delay(2000);
+    digitalWrite(yellowDiode, LOW);
+    digitalWrite(redDiode, HIGH);
+  }
+}
+
+void turnOnGreenDiode(int greenDiode, int yellowDiode, int redDiode)
+{
+  if(digitalRead(redDiode) == HIGH)
+  {
+    digitalWrite(redDiode, LOW);
+    digitalWrite(yellowDiode, HIGH);
+    delay(500);
+  }
+
+   if(digitalRead(redDiode) == LOW && digitalRead(yellowDiode) == HIGH)
+  {
+    digitalWrite(yellowDiode, LOW);
+    digitalWrite(greenDiode, HIGH);
+  }
+}
+
+void setStartParameters()
+{  
+  digitalWrite(GREEN_L, HIGH);
+  digitalWrite(GREEN_R, HIGH);
+  digitalWrite(RED_U, HIGH);
+  digitalWrite(RED_B, HIGH);
 }
