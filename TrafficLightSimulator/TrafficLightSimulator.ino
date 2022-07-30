@@ -36,74 +36,22 @@ void setup()
 void loop()
 {
   delay(2000); // waiting for cars to go left-right
-  turnOnRedDiode(GREEN_L, YELLOW_L, RED_L);
-  turnOnRedDiode(GREEN_R, YELLOW_R, RED_R);
+  traffic.turnOnRedDiodeAndOffGreen(GREEN_L, YELLOW_L, RED_L);
+  traffic.turnOnRedDiodeAndOffGreen(GREEN_R, YELLOW_R, RED_R);
 
-  turnOnZebraCross(GREEN_CROSS_L, RED_CROSS_L);
-
-  delay(2000);
-  turnOnGreenDiode(GREEN_U_B, YELLOW_U_B, RED_U_B); // waiting for cars to go up-bottom
+  traffic.turnOnZebraCrossControlledByTime(GREEN_CROSS_L, RED_CROSS_L);
 
   delay(2000);
-  turnOnRedDiode(GREEN_U_B, YELLOW_U_B, RED_U_B);
-
-  turnOnZebraCross(GREEN_CROSS_L, RED_CROSS_L);
+  traffic.turnOnGreenDiodeAndOffRed(GREEN_U_B, YELLOW_U_B, RED_U_B); // waiting for cars to go up-bottom
 
   delay(2000);
-  turnOnGreenDiode(GREEN_L, YELLOW_L, RED_L);
-  turnOnGreenDiode(GREEN_R, YELLOW_R, RED_R);
-}
+  traffic.turnOnRedDiodeAndOffGreen(GREEN_U_B, YELLOW_U_B, RED_U_B);
 
-void turnOnRedDiode(int greenDiode, int yellowDiode, int redDiode)
-{
-  if (digitalRead(greenDiode) == HIGH)
-  {
-    digitalWrite(greenDiode, LOW);
-    delay(200);
-  }
+  traffic.turnOnZebraCrossControlledByTime(GREEN_CROSS_L, RED_CROSS_L);
 
-  if (digitalRead(yellowDiode) == LOW && digitalRead(redDiode) == LOW)
-  {
-    digitalWrite(yellowDiode, HIGH);
-    delay(2000);
-    digitalWrite(yellowDiode, LOW);
-    digitalWrite(redDiode, HIGH);
-  }
-}
-
-void turnOnGreenDiode(int greenDiode, int yellowDiode, int redDiode)
-{
-  if (digitalRead(redDiode) == HIGH)
-  {
-    digitalWrite(redDiode, LOW);
-    digitalWrite(yellowDiode, HIGH);
-    delay(500);
-  }
-
-  if (digitalRead(redDiode) == LOW && digitalRead(yellowDiode) == HIGH)
-  {
-    digitalWrite(yellowDiode, LOW);
-    digitalWrite(greenDiode, HIGH);
-  }
-}
-
-void turnOnZebraCross(int greenDiode, int redDiode)
-{
-  if (digitalRead(greenDiode) == HIGH)
-  {
-    digitalWrite(greenDiode, LOW);
-    digitalWrite(redDiode, HIGH);
-
-    return;
-  }
-
-  if (digitalRead(redDiode) == HIGH)
-  {
-    digitalWrite(redDiode, LOW);
-    digitalWrite(greenDiode, HIGH);
-
-    return;
-  }
+  delay(2000);
+  traffic.turnOnGreenDiodeAndOffRed(GREEN_L, YELLOW_L, RED_L);
+  traffic.turnOnGreenDiodeAndOffRed(GREEN_R, YELLOW_R, RED_R);
 }
 
 void setStartParameters()

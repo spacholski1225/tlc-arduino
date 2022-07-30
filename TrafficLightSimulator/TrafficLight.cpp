@@ -16,7 +16,70 @@ void TrafficLight::setPinModes()
     }
 }
 
-void TrafficLight::turnOnDiodes() //only for tests purpose, to delete
+bool isHighDiodeState(int diode)
+{
+    if (digitalRead(diode) == HIGH)
+    {
+        return true;
+    }
+    return false;
+}
+
+void TrafficLight::turnOnGreenDiodeAndOffRed(int greenDiode, int yellowDiode, int redDiode)
+{
+    if (isHighDiodeState(redDiode) == true)
+    {
+        digitalWrite(redDiode, LOW);
+        digitalWrite(yellowDiode, HIGH);
+        delay(500);
+    }
+
+    if (!isHighDiodeState(redDiode) && isHighDiodeState(yellowDiode))
+    {
+        digitalWrite(yellowDiode, LOW);
+        digitalWrite(greenDiode, HIGH);
+    }
+}
+
+void TrafficLight::turnOnRedDiodeAndOffGreen(int greenDiode, int yellowDiode, int redDiode)
+{
+    
+  if (isHighDiodeState(greenDiode))
+  {
+    digitalWrite(greenDiode, LOW);
+    delay(200);
+  }
+
+  if (!isHighDiodeState(yellowDiode) && !isHighDiodeState(redDiode))
+  {
+    digitalWrite(yellowDiode, HIGH);
+    delay(2000);
+    digitalWrite(yellowDiode, LOW);
+    digitalWrite(redDiode, HIGH);
+  }
+}
+
+void TrafficLight::turnOnZebraCrossControlledByTime(int greenDiode, int redDiode)
+{
+    
+  if (isHighDiodeState(greenDiode))
+  {
+    digitalWrite(greenDiode, LOW);
+    digitalWrite(redDiode, HIGH);
+
+    return;
+  }
+
+  if (isHighDiodeState(redDiode))
+  {
+    digitalWrite(redDiode, LOW);
+    digitalWrite(greenDiode, HIGH);
+
+    return;
+  }
+}
+
+void TrafficLight::turnOnDiodes() // only for tests purpose, to delete
 {
     int diodesLength = sizeof(_diodes) / sizeof(*_diodes);
 
@@ -26,3 +89,4 @@ void TrafficLight::turnOnDiodes() //only for tests purpose, to delete
         delay(1);
     }
 }
+
