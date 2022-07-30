@@ -1,3 +1,5 @@
+#include "TrafficLight.h"
+
 #define RED_L 2
 #define YELLOW_L 3
 #define GREEN_L 4
@@ -13,15 +15,21 @@
 #define RED_CROSS_L A0
 #define GREEN_CROSS_L A1
 
-int diodes[] = {RED_L, YELLOW_L, GREEN_L, RED_U_B, YELLOW_U_B, GREEN_U_B, RED_R, YELLOW_R, GREEN_R, RED_CROSS_L, GREEN_CROSS_L};
+const int diodes[] = {RED_L, YELLOW_L, GREEN_L, RED_U_B, YELLOW_U_B, GREEN_U_B, RED_R, YELLOW_R, GREEN_R, RED_CROSS_L, GREEN_CROSS_L};
+
+TrafficLight traffic;
 
 void setup()
 {
-
   Serial.begin(9600);
 
-  Serial.println("setup");
-  setPinModes();
+  int diodesLength = sizeof(diodes) / sizeof(*diodes);
+  for (int index = 0; index < diodesLength; index++)
+  {
+    traffic.setDiodeToIndex(diodes[index], index);
+  }
+
+  traffic.setPinModes();
   setStartParameters();
 }
 
@@ -44,19 +52,6 @@ void loop()
   delay(2000);
   turnOnGreenDiode(GREEN_L, YELLOW_L, RED_L);
   turnOnGreenDiode(GREEN_R, YELLOW_R, RED_R);
-}
-
-void setPinModes()
-{
-  int diodesLength = sizeof(diodes) / sizeof(*diodes);
-
-  Serial.println(diodesLength);
-  for (int i = 0; i < diodesLength; i++)
-  {
-    Serial.println(i);
-    pinMode(diodes[i], OUTPUT);
-    delay(1);
-  }
 }
 
 void turnOnRedDiode(int greenDiode, int yellowDiode, int redDiode)
