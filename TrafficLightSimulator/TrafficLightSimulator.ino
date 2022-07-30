@@ -10,7 +10,10 @@
 #define YELLOW_R 9
 #define GREEN_R 10
 
-int diodes[] = {RED_L, YELLOW_L, GREEN_L, RED_U_B, YELLOW_U_B, GREEN_U_B, RED_R, YELLOW_R, GREEN_R};
+#define RED_CROSS_L A0
+#define GREEN_CROSS_L A1
+
+int diodes[] = {RED_L, YELLOW_L, GREEN_L, RED_U_B, YELLOW_U_B, GREEN_U_B, RED_R, YELLOW_R, GREEN_R, RED_CROSS_L, GREEN_CROSS_L};
 
 void setup()
 {
@@ -24,9 +27,11 @@ void setup()
 
 void loop()
 {
-  delay(2000);//waiting for cars to go left-right
+  delay(2000); // waiting for cars to go left-right
   turnOnRedDiode(GREEN_L, YELLOW_L, RED_L);
   turnOnRedDiode(GREEN_R, YELLOW_R, RED_R);
+
+  turnOnZebraCross(GREEN_CROSS_L, RED_CROSS_L);
 
   delay(2000);
   turnOnGreenDiode(GREEN_U_B, YELLOW_U_B, RED_U_B); // waiting for cars to go up-bottom
@@ -34,11 +39,11 @@ void loop()
   delay(2000);
   turnOnRedDiode(GREEN_U_B, YELLOW_U_B, RED_U_B);
 
+  turnOnZebraCross(GREEN_CROSS_L, RED_CROSS_L);
+
   delay(2000);
   turnOnGreenDiode(GREEN_L, YELLOW_L, RED_L);
   turnOnGreenDiode(GREEN_R, YELLOW_R, RED_R);
-
-
 }
 
 void setPinModes()
@@ -87,9 +92,32 @@ void turnOnGreenDiode(int greenDiode, int yellowDiode, int redDiode)
   }
 }
 
+void turnOnZebraCross(int greenDiode, int redDiode)
+{
+  if (digitalRead(greenDiode) == HIGH)
+  {
+    digitalWrite(greenDiode, LOW);
+    digitalWrite(redDiode, HIGH);
+
+    return;
+  }
+
+  if (digitalRead(redDiode) == HIGH)
+  {
+    digitalWrite(redDiode, LOW);
+    digitalWrite(greenDiode, HIGH);
+
+    return;
+  }
+}
+
 void setStartParameters()
 {
+  // setting traffic light
   digitalWrite(GREEN_L, HIGH);
   digitalWrite(GREEN_R, HIGH);
   digitalWrite(RED_U_B, HIGH);
+
+  // setting zebra cross
+  digitalWrite(RED_CROSS_L, HIGH);
 }
