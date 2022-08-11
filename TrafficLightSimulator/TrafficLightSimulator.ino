@@ -25,6 +25,8 @@ const int diodes[] = {RED_L, YELLOW_L, GREEN_L, RED_U_B, YELLOW_U_B, GREEN_U_B, 
 
 TrafficLight traffic;
 
+bool isDayMode = true;
+
 void setup()
 {
   Serial.begin(9600);
@@ -36,17 +38,36 @@ void setup()
   }
 
   traffic.setPinModes();
-  setStartParameters();
+
+  if (isDayMode) // to change cuz it run only once time, so always will execute setdDayModeStartParameters()
+  {
+    //setDayModeStartParameters();
+  }
+  else
+  {
+    //setNightModeStartParameters();
+  }
 }
 
 void loop()
+{
+
+  turnOnNightMode();
+}
+
+void turnOnNightMode()
+{
+  setNightModeStartParameters();
+}
+
+void turnOnDayMode()
 {
   delay(2000); // waiting for cars to go left-right
   traffic.turnOnRedDiodeAndOffGreen(GREEN_L, YELLOW_L, RED_L);
   traffic.turnOnGreenZebraCrossControlledByTime(GREEN_CROSS_CENTER, RED_CROSS_CENTER);
   traffic.turnOnRedDiodeAndOffGreen(GREEN_R, YELLOW_R, RED_R);
 
-  //turn on zebra lights 
+  // turn on zebra lights
   traffic.turnOnGreenZebraCrossControlledByTime(GREEN_CROSS_L, RED_CROSS_L);
   traffic.turnOnRedZebraCrossControlledByTime(GREEN_CROSS_U, RED_CROSS_U);
 
@@ -65,7 +86,7 @@ void loop()
   traffic.turnOnGreenDiodeAndOffRed(GREEN_R, YELLOW_R, RED_R);
 }
 
-void setStartParameters()
+void setDayModeStartParameters()
 {
   // setting traffic light
   digitalWrite(GREEN_L, HIGH);
@@ -78,6 +99,18 @@ void setStartParameters()
   // setting zebra cross for down
   digitalWrite(GREEN_CROSS_U, HIGH);
 
-  //setting center zebra cross
+  // setting center zebra cross
+  digitalWrite(RED_CROSS_CENTER, HIGH);
+}
+
+void setNightModeStartParameters()
+{
+  //setup traffic lights
+  digitalWrite(GREEN_L, HIGH);
+  digitalWrite(GREEN_U_B, HIGH);
+
+  //setup zebra cross
+  digitalWrite(RED_CROSS_L, HIGH);
+  digitalWrite(RED_CROSS_U, HIGH);
   digitalWrite(RED_CROSS_CENTER, HIGH);
 }
