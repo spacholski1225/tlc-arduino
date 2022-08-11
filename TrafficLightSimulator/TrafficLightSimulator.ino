@@ -15,6 +15,12 @@
 #define RED_CROSS_L A0
 #define GREEN_CROSS_L A1
 
+#define GREEN_CROSS_U 5
+#define RED_CROSS_U 6
+
+#define GREEN_CROSS_CENTER 11
+#define RED_CROSS_CENTER 12
+
 const int diodes[] = {RED_L, YELLOW_L, GREEN_L, RED_U_B, YELLOW_U_B, GREEN_U_B, RED_R, YELLOW_R, GREEN_R, RED_CROSS_L, GREEN_CROSS_L};
 
 TrafficLight traffic;
@@ -37,9 +43,12 @@ void loop()
 {
   delay(2000); // waiting for cars to go left-right
   traffic.turnOnRedDiodeAndOffGreen(GREEN_L, YELLOW_L, RED_L);
+  traffic.turnOnGreenZebraCrossControlledByTime(GREEN_CROSS_CENTER, RED_CROSS_CENTER);
   traffic.turnOnRedDiodeAndOffGreen(GREEN_R, YELLOW_R, RED_R);
 
-  traffic.turnOnZebraCrossControlledByTime(GREEN_CROSS_L, RED_CROSS_L);
+  //turn on zebra lights 
+  traffic.turnOnGreenZebraCrossControlledByTime(GREEN_CROSS_L, RED_CROSS_L);
+  traffic.turnOnRedZebraCrossControlledByTime(GREEN_CROSS_U, RED_CROSS_U);
 
   delay(2000);
   traffic.turnOnGreenDiodeAndOffRed(GREEN_U_B, YELLOW_U_B, RED_U_B); // waiting for cars to go up-bottom
@@ -47,9 +56,11 @@ void loop()
   delay(2000);
   traffic.turnOnRedDiodeAndOffGreen(GREEN_U_B, YELLOW_U_B, RED_U_B);
 
-  traffic.turnOnZebraCrossControlledByTime(GREEN_CROSS_L, RED_CROSS_L);
+  traffic.turnOnGreenZebraCrossControlledByTime(GREEN_CROSS_U, RED_CROSS_U);
+  traffic.turnOnRedZebraCrossControlledByTime(GREEN_CROSS_L, RED_CROSS_L);
 
   delay(2000);
+  traffic.turnOnRedZebraCrossControlledByTime(GREEN_CROSS_CENTER, RED_CROSS_CENTER);
   traffic.turnOnGreenDiodeAndOffRed(GREEN_L, YELLOW_L, RED_L);
   traffic.turnOnGreenDiodeAndOffRed(GREEN_R, YELLOW_R, RED_R);
 }
@@ -61,6 +72,12 @@ void setStartParameters()
   digitalWrite(GREEN_R, HIGH);
   digitalWrite(RED_U_B, HIGH);
 
-  // setting zebra cross
+  // setting zebra cross for left up
   digitalWrite(RED_CROSS_L, HIGH);
+
+  // setting zebra cross for down
+  digitalWrite(GREEN_CROSS_U, HIGH);
+
+  //setting center zebra cross
+  digitalWrite(RED_CROSS_CENTER, HIGH);
 }

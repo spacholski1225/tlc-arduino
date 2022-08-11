@@ -59,19 +59,25 @@ void TrafficLight::turnOnRedDiodeAndOffGreen(int greenDiode, int yellowDiode, in
   }
 }
 
-void TrafficLight::turnOnZebraCrossControlledByTime(int greenDiode, int redDiode)
+void TrafficLight::turnOnRedZebraCrossControlledByTime(int greenDiode, int redDiode)
 {
-    
+  Serial.println("turnOnZebraCrossControlledByTime");
+
   if (isHighDiodeState(greenDiode))
   {
+    Serial.println("GREEN DIODE ON");
     digitalWrite(greenDiode, LOW);
     digitalWrite(redDiode, HIGH);
 
     return;
   }
+}
 
+void TrafficLight::turnOnGreenZebraCrossControlledByTime(int greenDiode, int redDiode)
+{
   if (isHighDiodeState(redDiode))
   {
+    Serial.println("RED DIODE ON");
     digitalWrite(redDiode, LOW);
     digitalWrite(greenDiode, HIGH);
 
