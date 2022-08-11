@@ -13,7 +13,8 @@ class TrafficLight
         void setDiodeToIndex(int diode, int index);
         void turnOnGreenDiodeAndOffRed(int greenDiode, int yellowDiode, int redDiode);
         void turnOnRedDiodeAndOffGreen(int greenDiode, int yellowDiode, int redDiode);
-        void turnOnZebraCrossControlledByTime(int greenDiode, int redDiode);
+        void turnOnRedZebraCrossControlledByTime(int greenDiode, int redDiode);
+        void turnOnGreenZebraCrossControlledByTime(int greenDiode, int redDiode);
         void turnOnDiodes();//only for tests purpose
 };
 
