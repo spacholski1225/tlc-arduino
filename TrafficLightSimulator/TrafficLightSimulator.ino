@@ -17,6 +17,9 @@
 #define BUTTON_CROSS_L 10
 #define BUTTON_CROSS_B 11
 
+#define TRIGGER_1 7
+#define ECHO_1 6
+
 PCF8574 crossExpander;
 PCF8574 lightExpander;
 
@@ -30,6 +33,8 @@ bool isDayMode = false;
 bool isOnLeftCross = false;
 bool isOnBottomCross = true;
 
+bool wasUsedSonar = false;
+
 void setup()
 {
   crossExpander.begin(0x20);
@@ -37,6 +42,9 @@ void setup()
 
   pinMode(BUTTON_CROSS_L, INPUT_PULLUP);
   pinMode(BUTTON_CROSS_B, INPUT_PULLUP);
+
+  pinMode(TRIGGER_1, OUTPUT); // Pin, do którego podłączymy trig jako wyjście
+  pinMode(ECHO_1, INPUT);     // a echo, jako wejście
 
   Serial.begin(9600);
 
@@ -57,12 +65,29 @@ void loop()
   turnOnNightMode();
 }
 
+int getDistance()
+{
+  delay(1000);
+  long time, distance;
+
+  digitalWrite(TRIGGER_1, LOW);
+  delayMicroseconds(20);
+  digitalWrite(TRIGGER_1, HIGH);
+  delayMicroseconds(100);
+  digitalWrite(TRIGGER_1, LOW);
+
+  time = pulseIn(ECHO_1, HIGH);
+  distance = time / 58;
+
+  return distance;
+}
+
 void turnOnCrossLightAfterButtonClick(int crossGreenDiode, int crossRedDiode, int lightGreenDiode, int lightYellowDiode, int lightRedDiode)
 {
+  turnOnRedDiodeAndOffGreen(lightGreenDiode, lightYellowDiode, lightRedDiode);
+
   crossExpander.digitalWrite(crossRedDiode, LOW);
   crossExpander.digitalWrite(crossGreenDiode, HIGH);
-
-  turnOnRedDiodeAndOffGreen(lightGreenDiode, lightYellowDiode, lightRedDiode);
 
   delay(5000);
 
@@ -70,6 +95,39 @@ void turnOnCrossLightAfterButtonClick(int crossGreenDiode, int crossRedDiode, in
   crossExpander.digitalWrite(crossGreenDiode, LOW);
 
   turnOnGreenDiodeAndOffRed(lightGreenDiode, lightYellowDiode, lightRedDiode);
+}
+
+void turnOnLightAfterAppropriateDistance(int crossGreenDiode, int crossRedDiode, int lightGreenDiode, int lightYellowDiode, int lightRedDiode)
+{
+  int distance = getDistance();
+
+  Serial.println(distance);
+
+  if (distance < 5)
+  {
+    if (wasUsedSonar)
+    {
+      return;
+    }
+
+    crossExpander.digitalWrite(crossRedDiode, HIGH);
+    crossExpander.digitalWrite(crossGreenDiode, LOW);
+
+    turnOnGreenDiodeAndOffRed(lightGreenDiode, lightYellowDiode, lightRedDiode);
+
+    wasUsedSonar = true;
+
+    return;
+  }
+  if (wasUsedSonar && distance > 5)
+  {
+    wasUsedSonar = false;
+
+    turnOnRedDiodeAndOffGreen(lightGreenDiode, lightYellowDiode, lightRedDiode);
+
+    crossExpander.digitalWrite(crossRedDiode, LOW);
+    crossExpander.digitalWrite(crossGreenDiode, HIGH);
+  }
 }
 
 void setUpExpanderDiodes()
@@ -103,25 +161,18 @@ void turnOnNightMode()
     turnOnCrossLightAfterButtonClick(EXPANDER1_GREEN_CROSS_L, EXPANDER1_RED_CROSS_L, EXPANDER2_GREEN_L, EXPANDER2_YELLOW_L, EXPANDER2_RED_L);
     isOnLeftCross = false;
   }
+
+  turnOnLightAfterAppropriateDistance(EXPANDER1_GREEN_CROSS_B, EXPANDER1_RED_CROSS_B, EXPANDER2_GREEN_B, EXPANDER2_YELLOW_B, EXPANDER2_RED_B);
 }
 
 void turnOnRedDiodeAndOffGreen(int greenDiode, int yellowDiode, int redDiode) // to jest zjebana metoda trzeba ja przerobic!
 {
-  if (lightExpander.digitalRead(greenDiode) == HIGH)
-  {
-    lightExpander.digitalWrite(greenDiode, LOW);
-    delay(200);
-  }
+  lightExpander.digitalWrite(greenDiode, LOW); // only to check
 
-  if (lightExpander.digitalRead(yellowDiode) == LOW && lightExpander.digitalRead(redDiode) == LOW)
-  {
-    lightExpander.digitalWrite(greenDiode, LOW); // only to check
-
-    lightExpander.digitalWrite(yellowDiode, HIGH);
-    delay(2000);
-    lightExpander.digitalWrite(yellowDiode, LOW);
-    lightExpander.digitalWrite(redDiode, HIGH);
-  }
+  lightExpander.digitalWrite(yellowDiode, HIGH);
+  delay(2000);
+  lightExpander.digitalWrite(yellowDiode, LOW);
+  lightExpander.digitalWrite(redDiode, HIGH);
 }
 
 void turnOnGreenDiodeAndOffRed(int greenDiode, int yellowDiode, int redDiode)
