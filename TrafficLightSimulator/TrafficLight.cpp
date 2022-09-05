@@ -14,6 +14,18 @@
 #define EXPANDER2_YELLOW_UB 2
 #define EXPANDER2_GREEN_UB 1
 
+#define EXPANDER3_RED_CROSS_LR 0
+#define EXPANDER3_GREEN_CROSS_LR 1
+#define EXPANDER3_RED_CROSS_UB 2
+#define EXPANDER3_GREEN_CROSS_UB 3
+
+#define EXPANDER4_RED_LR 6
+#define EXPANDER4_YELLOW_LR 5
+#define EXPANDER4_GREEN_LR 4
+#define EXPANDER4_RED_UB 3
+#define EXPANDER4_YELLOW_UB 2
+#define EXPANDER4_GREEN_UB 1
+
 #define TRIGGER_1 7
 #define ECHO_1 6
 
@@ -22,19 +34,25 @@
 
 PCF8574 _crossExpander;
 PCF8574 _lightExpander;
+PCF8574 _crossExpander2;
+PCF8574 _lightExpander2;
 
 const int crossExpanderDiodes[] = {EXPANDER1_RED_CROSS_LR, EXPANDER1_GREEN_CROSS_LR, EXPANDER1_RED_CROSS_UB, EXPANDER1_GREEN_CROSS_UB};
 const int lightExpanderDiodes[] = {EXPANDER2_RED_LR, EXPANDER2_YELLOW_LR, EXPANDER2_GREEN_LR, EXPANDER2_RED_UB, EXPANDER2_YELLOW_UB, EXPANDER2_GREEN_UB};
+const int crossExpanderDiodes2[] = {EXPANDER3_RED_CROSS_LR, EXPANDER3_GREEN_CROSS_LR, EXPANDER3_RED_CROSS_UB, EXPANDER3_GREEN_CROSS_UB};
+const int lightExpanderDiodes2[] = {EXPANDER4_RED_LR, EXPANDER4_YELLOW_LR, EXPANDER4_GREEN_LR, EXPANDER4_RED_UB, EXPANDER4_YELLOW_UB, EXPANDER4_GREEN_UB};
 
 bool wasUsedSonar = false;
 
 bool isOnLeftCross = false;
 bool isOnBottomCross = true;
 
-void TrafficLight::setUpTrafficLight(PCF8574 crossExpander, PCF8574 lightExpander)
+void TrafficLight::setUpTrafficLight(PCF8574 crossExpander, PCF8574 lightExpander, PCF8574 crossExpander2, PCF8574 lightExpander2)
 {
   _lightExpander = lightExpander;
   _crossExpander = crossExpander;
+  _lightExpander2 = lightExpander2;
+  _crossExpander2 = crossExpander2;
 
   pinMode(TRIGGER_1, OUTPUT);
   pinMode(ECHO_1, INPUT);
@@ -183,26 +201,34 @@ void TrafficLight::setNightModeStartParameters()
 {
   // setup traffic lights
   _lightExpander.digitalWrite(EXPANDER2_GREEN_LR, HIGH);
+  _lightExpander2.digitalWrite(EXPANDER4_GREEN_LR, HIGH);
   _lightExpander.digitalWrite(EXPANDER2_RED_UB, HIGH);
+  _lightExpander2.digitalWrite(EXPANDER4_RED_UB, HIGH);
 
   // setup zebra cross
   _crossExpander.digitalWrite(EXPANDER1_RED_CROSS_LR, HIGH);
+  _crossExpander2.digitalWrite(EXPANDER3_RED_CROSS_LR, HIGH);
   _crossExpander.digitalWrite(EXPANDER1_GREEN_CROSS_UB, HIGH);
+  _crossExpander2.digitalWrite(EXPANDER3_GREEN_CROSS_UB, HIGH);
 }
 
 void TrafficLight::setDayModeStartParameters()
 {
 
   // setting traffic light
-  _lightExpander.digitalWrite(EXPANDER2_GREEN_LR, HIGH);
+  _lightExpander.digitalWrite(EXPANDER2_GREEN_LR, LOW);
+  _lightExpander2.digitalWrite(EXPANDER4_GREEN_LR, HIGH);
   // digitalWrite(GREEN_R, HIGH);
-  _lightExpander.digitalWrite(EXPANDER2_RED_UB, HIGH);
+  _lightExpander.digitalWrite(EXPANDER2_RED_UB, LOW);
+  _lightExpander2.digitalWrite(EXPANDER4_RED_UB, HIGH);
 
   // setting zebra cross for left up
-  _crossExpander.digitalWrite(EXPANDER1_RED_CROSS_LR, HIGH);
+  _crossExpander.digitalWrite(EXPANDER1_RED_CROSS_LR, LOW);
+  _crossExpander2.digitalWrite(EXPANDER3_RED_CROSS_LR, HIGH);
 
   // setting zebra cross for down
-  _crossExpander.digitalWrite(EXPANDER1_GREEN_CROSS_UB, HIGH);
+  _crossExpander.digitalWrite(EXPANDER1_GREEN_CROSS_UB, LOW);
+  _crossExpander2.digitalWrite(EXPANDER3_GREEN_CROSS_UB, HIGH);
 
   // setting center zebra cross
   // digitalWrite(RED_CROSS_CENTER, HIGH);
@@ -211,26 +237,34 @@ void TrafficLight::setDayModeStartParameters()
 void TrafficLight::dayMode()
 {
   delay(2000); // waiting for cars to go left-right
-  dayModeTurnOnRedDiodeAndOffGreen(EXPANDER2_GREEN_LR, EXPANDER2_YELLOW_LR, EXPANDER2_RED_LR);
+  dayModeTurnOnRedDiodeAndOffGreen(EXPANDER2_GREEN_LR, EXPANDER2_YELLOW_LR, EXPANDER2_RED_LR); // zmienic te funkcje tak zeby korzystaly z innych expanderow
+  //dayModeTurnOnRedDiodeAndOffGreen(EXPANDER4_GREEN_LR, EXPANDER4_YELLOW_LR, EXPANDER4_RED_LR);
   // dayModeTurnOnGreenZebraCrossControlledByTime(GREEN_CROSS_CENTER, RED_CROSS_CENTER);
   // dayModeTurnOnRedDiodeAndOffGreen(GREEN_R, YELLOW_R, RED_R);
 
   // turn on zebra lights
   dayModeTurnOnGreenZebraCrossControlledByTime(EXPANDER1_GREEN_CROSS_LR, EXPANDER1_RED_CROSS_LR);
+  //dayModeTurnOnGreenZebraCrossControlledByTime(EXPANDER3_GREEN_CROSS_LR, EXPANDER3_RED_CROSS_LR);
   dayModeTurnOnRedZebraCrossControlledByTime(EXPANDER1_GREEN_CROSS_UB, EXPANDER1_RED_CROSS_UB);
+  //dayModeTurnOnRedZebraCrossControlledByTime(EXPANDER3_GREEN_CROSS_UB, EXPANDER3_RED_CROSS_UB);
 
   delay(2000);
   dayModeTurnOnGreenDiodeAndOffRed(EXPANDER2_GREEN_UB, EXPANDER2_YELLOW_UB, EXPANDER2_RED_UB); // waiting for cars to go up-bottom
+ // dayModeTurnOnGreenDiodeAndOffRed(EXPANDER4_GREEN_UB, EXPANDER4_YELLOW_UB, EXPANDER4_RED_UB); // waiting for cars to go up-bottom
 
   delay(2000);
   dayModeTurnOnRedDiodeAndOffGreen(EXPANDER2_GREEN_UB, EXPANDER2_YELLOW_UB, EXPANDER2_RED_UB);
+  //dayModeTurnOnRedDiodeAndOffGreen(EXPANDER4_GREEN_UB, EXPANDER4_YELLOW_UB, EXPANDER4_RED_UB);
 
   dayModeTurnOnGreenZebraCrossControlledByTime(EXPANDER1_GREEN_CROSS_UB, EXPANDER1_RED_CROSS_UB);
+ // dayModeTurnOnGreenZebraCrossControlledByTime(EXPANDER3_GREEN_CROSS_UB, EXPANDER3_RED_CROSS_UB);
   dayModeTurnOnRedZebraCrossControlledByTime(EXPANDER1_GREEN_CROSS_LR, EXPANDER1_RED_CROSS_LR);
+  //dayModeTurnOnRedZebraCrossControlledByTime(EXPANDER3_GREEN_CROSS_LR, EXPANDER3_RED_CROSS_LR);
 
   delay(2000);
   // dayModeTurnOnRedZebraCrossControlledByTime(GREEN_CROSS_CENTER, RED_CROSS_CENTER);
   dayModeTurnOnGreenDiodeAndOffRed(EXPANDER2_GREEN_LR, EXPANDER2_YELLOW_LR, EXPANDER2_RED_LR);
+  //dayModeTurnOnGreenDiodeAndOffRed(EXPANDER4_GREEN_LR, EXPANDER4_YELLOW_LR, EXPANDER4_RED_LR);
   // dayModeTurnOnGreenDiodeAndOffRed(GREEN_R, YELLOW_R, RED_R);
 }
 
