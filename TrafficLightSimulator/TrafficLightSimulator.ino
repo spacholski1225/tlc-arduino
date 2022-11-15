@@ -2,11 +2,10 @@
 #include "TrafficLight.h"
 #include "PCF8574.h"
 
-
-PCF8574 crossExpander;
-PCF8574 lightExpander;
-PCF8574 crossExpander2;
-PCF8574 lightExpander2;
+PCF8574 CE1; //CE1
+PCF8574 LE2;
+PCF8574 CE2;
+PCF8574 LE1;
 
 TrafficLight traffic;
 
@@ -14,22 +13,23 @@ bool isDayMode = true;
 
 void setup()
 {
-  crossExpander.begin(0x20);
-  lightExpander.begin(0x21);
-  crossExpander2.begin(0x22);
-  lightExpander2.begin(0x24);
+  CE1.begin(0x20); //CE1
+  LE2.begin(0x24); // LE2
+  CE2.begin(0x22); // CE2
+  LE1.begin(0x21); //LE1
 
   Serial.begin(9600);
 
-  if (isDayMode) // to change cuz it run only once time, so always will execute setdDayModeStartParameters()
+  if(isDayMode)
   {
-    traffic.setUpTrafficLight(crossExpander, lightExpander, crossExpander2, lightExpander2);
+    traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
     traffic.setDayModeStartParameters();
   }
+
   else
   {
-    traffic.setUpTrafficLight(crossExpander, lightExpander, crossExpander2, lightExpander2);
-    //traffic.setUpTrafficLight(crossExpander2, lightExpander2);
+    traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+    //traffic.setUpTrafficLight(CE2, LE1);
     traffic.setNightModeStartParameters();
   }
 }

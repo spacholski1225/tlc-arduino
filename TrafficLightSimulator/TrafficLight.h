@@ -8,7 +8,7 @@
 class TrafficLight 
 {
     public:
-        void setUpTrafficLight(PCF8574 crossExpander, PCF8574 lightExpander, PCF8574 crossExpander2, PCF8574 lightExpander2);
+        void setUpTrafficLight(PCF8574 CE1, PCF8574 LE2, PCF8574 CE2, PCF8574 LE1);
         void dayMode();
         void setDayModeStartParameters();
         void nightMode();
