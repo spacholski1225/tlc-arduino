@@ -2,14 +2,18 @@
 #include "TrafficLight.h"
 #include "PCF8574.h"
 
-PCF8574 CE1; //CE1
+#define TOGGLE_MODE 9
+
+PCF8574 CE1;
 PCF8574 LE2;
 PCF8574 CE2;
 PCF8574 LE1;
 
-TrafficLight traffic;
+TrafficLight _traffic;
 
-bool isDayMode = true;
+bool _shouldBeStartUpParams;
+bool _isDayMode;
+bool _lastState;
 
 void setup()
 {
@@ -18,30 +22,52 @@ void setup()
   CE2.begin(0x22); // CE2
   LE1.begin(0x21); //LE1
 
-  Serial.begin(9600);
+  pinMode(TOGGLE_MODE, INPUT);
 
-  if(isDayMode)
+  _isDayMode = digitalRead(TOGGLE_MODE) == HIGH;
+
+  if(_isDayMode)
   {
-    traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
-    traffic.setDayModeStartParameters();
+    _traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+    _traffic.setDayModeStartParameters();
   }
 
   else
   {
-    traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
-    //traffic.setUpTrafficLight(CE2, LE1);
-    traffic.setNightModeStartParameters();
+    _traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+    _traffic.setNightModeStartParameters();
   }
 }
 
 void loop()
 {
-  if (isDayMode)
+  _lastState = _isDayMode;
+  _isDayMode = digitalRead(TOGGLE_MODE);
+
+  if (_isDayMode)
   {
-    traffic.dayMode();
+    if(!_lastState && _isDayMode)
+    {
+      _traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+      _traffic.setDayModeStartParameters(); 
+
+      _shouldBeStartUpParams = false;
+      delay(1000);
+    }
+
+    _traffic.dayMode();
   }
   else
   {
-    traffic.nightMode();
+    if(_lastState && !_isDayMode)
+    {
+      _traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+      _traffic.setNightModeStartParameters();
+
+      _shouldBeStartUpParams = false;
+      delay(1000);
+    }
+
+    _traffic.nightMode();
   }
 }

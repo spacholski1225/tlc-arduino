@@ -49,15 +49,17 @@ PCF8574 _LE2;
 PCF8574 _CE2;
 PCF8574 _LE1;
 
-const int crossExpander1Diodes[] = {CE1_P0_R, CE1_P1_G, CE1_P2_R, CE1_P3_G};
-const int lightExpander2Diodes[] = {LE2_P6_R, LE2_P5_Y, LE2_P4_G, LE2_P2_R, LE2_P1_Y, LE2_P0_G};
-const int crossExpander2Diodes[] = {CE2_P0_R, CE2_P1_G, CE2_P2_R, CE2_P3_G, CE2_P5_R, CE2_P6_G};
-const int lightExpander1Diodes[] = {LE1_P6_R, LE1_P5_Y, LE1_P4_G, LE1_P2_R, LE1_P1_Y, LE1_P0_G};
+const int CROSS_EXPANDER1_DIODES[] = {CE1_P0_R, CE1_P1_G, CE1_P2_R, CE1_P3_G};
+const int LIGHT_EXPANDER2_DIODES[] = {LE2_P6_R, LE2_P5_Y, LE2_P4_G, LE2_P2_R, LE2_P1_Y, LE2_P0_G};
+const int CROSS_EXPANDER2_DIODES[] = {CE2_P0_R, CE2_P1_G, CE2_P2_R, CE2_P3_G, CE2_P5_R, CE2_P6_G};
+const int LIGHT_EXPANDER1_DIODES[] = {LE1_P6_R, LE1_P5_Y, LE1_P4_G, LE1_P2_R, LE1_P1_Y, LE1_P0_G};
 
-bool wasUsedSonar = false;
+bool _wasUsedSonar1 = false;
+bool _wasUsedSonar2 = false;
 
-bool isOnLeftCross = false;
-bool isOnBottomCross = true;
+bool _isOnLeftCross = false;
+bool _isOnBottomCross = false;
+bool _isOnRightCross = false;
 
 void TrafficLight::setUpTrafficLight(PCF8574 CE1, PCF8574 LE2, PCF8574 CE2, PCF8574 LE1)
 {
@@ -79,89 +81,87 @@ void TrafficLight::setUpTrafficLight(PCF8574 CE1, PCF8574 LE2, PCF8574 CE2, PCF8
   pinMode(B2, INPUT_PULLUP);
   pinMode(B3, INPUT_PULLUP);
 
-  int crossExpander1Length = sizeof(crossExpander1Diodes) / sizeof(*crossExpander1Diodes);
+  int crossExpander1Length = sizeof(CROSS_EXPANDER1_DIODES) / sizeof(*CROSS_EXPANDER1_DIODES);
   for (int index = 0; index < crossExpander1Length; index++)
   {
-    _CE1.pinMode(crossExpander1Diodes[index], OUTPUT);
+    _CE1.pinMode(CROSS_EXPANDER1_DIODES[index], OUTPUT);
   }
 
-  int lightExpander2Length = sizeof(lightExpander2Diodes) / sizeof(*lightExpander2Diodes);
+  int lightExpander2Length = sizeof(LIGHT_EXPANDER2_DIODES) / sizeof(*LIGHT_EXPANDER2_DIODES);
   for (int index = 0; index < lightExpander2Length; index++)
   {
-    _LE2.pinMode(lightExpander2Diodes[index], OUTPUT);
+    _LE2.pinMode(LIGHT_EXPANDER2_DIODES[index], OUTPUT);
   }
 
-  int crossExpander2Length = sizeof(crossExpander2Diodes) / sizeof(*crossExpander2Diodes);
+  int crossExpander2Length = sizeof(CROSS_EXPANDER2_DIODES) / sizeof(*CROSS_EXPANDER2_DIODES);
   for (int index = 0; index < crossExpander2Length; index++)
   {
-    _CE2.pinMode(crossExpander2Diodes[index], OUTPUT);
+    _CE2.pinMode(CROSS_EXPANDER2_DIODES[index], OUTPUT);
   }
 
-  int lightExpander1Length = sizeof(lightExpander1Diodes) / sizeof(*lightExpander1Diodes);
+  int lightExpander1Length = sizeof(LIGHT_EXPANDER1_DIODES) / sizeof(*LIGHT_EXPANDER1_DIODES);
   for (int index = 0; index < lightExpander1Length; index++)
   {
-    _LE1.pinMode(lightExpander1Diodes[index], OUTPUT);
+    _LE1.pinMode(LIGHT_EXPANDER1_DIODES[index], OUTPUT);
   }
 }
 
-// int getDistance()
-// {
-//   delay(1000);
-//   long time, distance;
-
-//   digitalWrite(TRIGGER_1, LOW);
-//   delayMicroseconds(20);
-//   digitalWrite(TRIGGER_1, HIGH);
-//   delayMicroseconds(100);
-//   digitalWrite(TRIGGER_1, LOW);
-
-//   time = pulseIn(ECHO_1, HIGH);
-//   distance = time / 58;
-
-//   return distance;
-// }
-
-void nightModeTurnOnRedDiodeAndOffGreen(int greenDiode, int yellowDiode, int redDiode)
+int getDistance(int trigger, int echo)
 {
-  _LE2.digitalWrite(greenDiode, LOW);
+  delay(1000);
+  long time, distance;
 
-  _LE2.digitalWrite(yellowDiode, HIGH);
-  delay(2000);
-  _LE2.digitalWrite(yellowDiode, LOW);
-  _LE2.digitalWrite(redDiode, HIGH);
+  digitalWrite(trigger, LOW);
+  delayMicroseconds(20);
+  digitalWrite(trigger, HIGH);
+  delayMicroseconds(100);
+  digitalWrite(trigger, LOW);
+
+  time = pulseIn(echo, HIGH);
+  distance = time / 58;
+
+  return distance;
 }
 
-void nightModeTurnOnGreenDiodeAndOffRed(int greenDiode, int yellowDiode, int redDiode)
+void nightModeTurnOnRedDiodeAndOffGreen(PCF8574 expander, int greenDiode, int yellowDiode, int redDiode)
+{
+  expander.digitalWrite(greenDiode, LOW);
+
+  expander.digitalWrite(yellowDiode, HIGH);
+  delay(2000);
+  expander.digitalWrite(yellowDiode, LOW);
+  expander.digitalWrite(redDiode, HIGH);
+}
+
+void nightModeTurnOnGreenDiodeAndOffRed(PCF8574 expander, int greenDiode, int yellowDiode, int redDiode)
 {
 
-  _LE2.digitalWrite(redDiode, LOW);
-  _LE2.digitalWrite(yellowDiode, HIGH);
+  expander.digitalWrite(redDiode, LOW);
+  expander.digitalWrite(yellowDiode, HIGH);
   delay(500);
 
-  _LE2.digitalWrite(yellowDiode, LOW);
-  _LE2.digitalWrite(greenDiode, HIGH);
+  expander.digitalWrite(yellowDiode, LOW);
+  expander.digitalWrite(greenDiode, HIGH);
 }
 
-void nightModeTurnOnCrossLightAfterButtonClick(int crossGreenDiode, int crossRedDiode, int lightGreenDiode, int lightYellowDiode, int lightRedDiode)
+void nightModeTurnOnCrossLightAfterButtonClick(PCF8574 expander, int crossGreenDiode, int crossRedDiode, int lightGreenDiode, int lightYellowDiode, int lightRedDiode)
 {
-  nightModeTurnOnRedDiodeAndOffGreen(lightGreenDiode, lightYellowDiode, lightRedDiode);
+  nightModeTurnOnRedDiodeAndOffGreen(expander, lightGreenDiode, lightYellowDiode, lightRedDiode);
 
-  _CE1.digitalWrite(crossRedDiode, LOW);
-  _CE1.digitalWrite(crossGreenDiode, HIGH);
+  expander.digitalWrite(crossRedDiode, LOW);
+  expander.digitalWrite(crossGreenDiode, HIGH);
 
   delay(5000);
 
-  _CE1.digitalWrite(crossRedDiode, HIGH);
-  _CE1.digitalWrite(crossGreenDiode, LOW);
+  expander.digitalWrite(crossRedDiode, HIGH);
+  expander.digitalWrite(crossGreenDiode, LOW);
 
-  nightModeTurnOnGreenDiodeAndOffRed(lightGreenDiode, lightYellowDiode, lightRedDiode);
+  nightModeTurnOnGreenDiodeAndOffRed(expander, lightGreenDiode, lightYellowDiode, lightRedDiode);
 }
 
-/*void nightModeTurnOnLightAfterAppropriateDistance(int crossGreenDiode, int crossRedDiode, int lightGreenDiode, int lightYellowDiode, int lightRedDiode)
+void nightModeTurnOnLightAfterAppropriateDistance(PCF8574 crossExpander, PCF8574 lightExpander, int crossGreenDiode, int crossRedDiode, int lightGreenDiode, int lightYellowDiode, int lightRedDiode, int trigger, int echo, bool wasUsedSonar)
 {
-  int distance = getDistance();
-
-  Serial.println(distance);
+  int distance = getDistance(trigger, echo);
 
   if (distance < 5)
   {
@@ -170,10 +170,10 @@ void nightModeTurnOnCrossLightAfterButtonClick(int crossGreenDiode, int crossRed
       return;
     }
 
-    _CE1.digitalWrite(crossRedDiode, HIGH);
-    _CE1.digitalWrite(crossGreenDiode, LOW);
+    crossExpander.digitalWrite(crossRedDiode, HIGH);
+    crossExpander.digitalWrite(crossGreenDiode, LOW);
 
-    nightModeTurnOnGreenDiodeAndOffRed(lightGreenDiode, lightYellowDiode, lightRedDiode);
+    nightModeTurnOnGreenDiodeAndOffRed(lightExpander, lightGreenDiode, lightYellowDiode, lightRedDiode);
 
     wasUsedSonar = true;
 
@@ -184,47 +184,46 @@ void nightModeTurnOnCrossLightAfterButtonClick(int crossGreenDiode, int crossRed
   {
     wasUsedSonar = false;
 
-    nightModeTurnOnRedDiodeAndOffGreen(lightGreenDiode, lightYellowDiode, lightRedDiode);
+    nightModeTurnOnRedDiodeAndOffGreen(lightExpander, lightGreenDiode, lightYellowDiode, lightRedDiode);
 
-    _CE1.digitalWrite(crossRedDiode, LOW);
-    _CE1.digitalWrite(crossGreenDiode, HIGH);
+    crossExpander.digitalWrite(crossRedDiode, LOW);
+    crossExpander.digitalWrite(crossGreenDiode, HIGH);
   }
 }
-*/
 
-void dayModeTurnOnGreenDiodeAndOffRed(int greenDiode, int yellowDiode, int redDiode)
+void dayModeTurnOnGreenDiodeAndOffRed(PCF8574 expander, int greenDiode, int yellowDiode, int redDiode)
 {
-  _LE2.digitalWrite(redDiode, LOW);
-  _LE2.digitalWrite(yellowDiode, HIGH);
+  expander.digitalWrite(redDiode, LOW);
+  expander.digitalWrite(yellowDiode, HIGH);
   delay(500);
 
-  _LE2.digitalWrite(yellowDiode, LOW);
-  _LE2.digitalWrite(greenDiode, HIGH);
+  expander.digitalWrite(yellowDiode, LOW);
+  expander.digitalWrite(greenDiode, HIGH);
 }
 
-void dayModeTurnOnRedDiodeAndOffGreen(int greenDiode, int yellowDiode, int redDiode)
+void dayModeTurnOnRedDiodeAndOffGreen(PCF8574 expander, int greenDiode, int yellowDiode, int redDiode)
 {
-  _LE2.digitalWrite(greenDiode, LOW);
+  expander.digitalWrite(greenDiode, LOW);
   delay(200);
 
-  _LE2.digitalWrite(yellowDiode, HIGH);
+  expander.digitalWrite(yellowDiode, HIGH);
   delay(2000);
-  _LE2.digitalWrite(yellowDiode, LOW);
-  _LE2.digitalWrite(redDiode, HIGH);
+  expander.digitalWrite(yellowDiode, LOW);
+  expander.digitalWrite(redDiode, HIGH);
 }
 
-void dayModeTurnOnRedZebraCrossControlledByTime(int greenDiode, int redDiode)
+void dayModeTurnOnRedZebraCrossControlledByTime(PCF8574 expander, int greenDiode, int redDiode)
 {
-  _CE1.digitalWrite(greenDiode, LOW);
-  _CE1.digitalWrite(redDiode, HIGH);
+  expander.digitalWrite(greenDiode, LOW);
+  expander.digitalWrite(redDiode, HIGH);
 
   return;
 }
 
-void dayModeTurnOnGreenZebraCrossControlledByTime(int greenDiode, int redDiode)
+void dayModeTurnOnGreenZebraCrossControlledByTime(PCF8574 expander, int greenDiode, int redDiode)
 {
-  _CE1.digitalWrite(redDiode, LOW);
-  _CE1.digitalWrite(greenDiode, HIGH);
+  expander.digitalWrite(redDiode, LOW);
+  expander.digitalWrite(greenDiode, HIGH);
 
   return;
 }
@@ -271,53 +270,70 @@ void TrafficLight::setDayModeStartParameters()
 void TrafficLight::dayMode()
 {
   delay(2000); // waiting for cars to go left-right
-  dayModeTurnOnRedDiodeAndOffGreen(LE2_P4_G, LE2_P5_Y, LE2_P6_R);
-  dayModeTurnOnRedDiodeAndOffGreen(LE1_P4_G, LE1_P5_Y, LE1_P6_R);
+  dayModeTurnOnRedDiodeAndOffGreen(_LE1, LE1_P4_G, LE1_P5_Y, LE1_P6_R);
+  dayModeTurnOnRedDiodeAndOffGreen(_LE2, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
 
   // turn on zebra lights
-  dayModeTurnOnGreenZebraCrossControlledByTime(CE1_P1_G, CE1_P0_R);
-  dayModeTurnOnGreenZebraCrossControlledByTime(CE2_P6_G, CE2_P5_R);
-  dayModeTurnOnGreenZebraCrossControlledByTime(CE2_P1_G, CE2_P0_R);
+  dayModeTurnOnGreenZebraCrossControlledByTime(_CE1, CE1_P1_G, CE1_P0_R);
+  dayModeTurnOnGreenZebraCrossControlledByTime(_CE2, CE2_P6_G, CE2_P5_R);
+  dayModeTurnOnGreenZebraCrossControlledByTime(_CE2, CE2_P1_G, CE2_P0_R);
 
-  dayModeTurnOnRedZebraCrossControlledByTime(CE1_P3_G, CE1_P2_R);
-  dayModeTurnOnRedZebraCrossControlledByTime(CE2_P3_G, CE2_P2_R);
-
-  delay(2000);
-  dayModeTurnOnGreenDiodeAndOffRed(LE2_P0_G, LE2_P1_Y, LE2_P2_R); // waiting for cars to go up-bottom
-  dayModeTurnOnGreenDiodeAndOffRed(LE1_P0_G, LE1_P1_Y, LE1_P2_R);
+  dayModeTurnOnRedZebraCrossControlledByTime(_CE1, CE1_P3_G, CE1_P2_R);
+  dayModeTurnOnRedZebraCrossControlledByTime(_CE2, CE2_P3_G, CE2_P2_R);
 
   delay(2000);
-  dayModeTurnOnRedDiodeAndOffGreen(LE2_P0_G, LE2_P1_Y, LE2_P2_R);
-  dayModeTurnOnRedDiodeAndOffGreen(LE1_P0_G, LE1_P1_Y, LE1_P2_R);
-
-  dayModeTurnOnGreenZebraCrossControlledByTime(CE1_P3_G, CE1_P2_R);
-  dayModeTurnOnGreenZebraCrossControlledByTime(CE2_P3_G, CE2_P2_R);
-
-  dayModeTurnOnRedZebraCrossControlledByTime(CE1_P1_G, CE1_P0_R);
-  dayModeTurnOnRedZebraCrossControlledByTime(CE2_P6_G, CE2_P5_R);
-  dayModeTurnOnRedZebraCrossControlledByTime(CE2_P1_G, CE2_P0_R);
+  dayModeTurnOnGreenDiodeAndOffRed(_LE1, LE1_P0_G, LE1_P1_Y, LE1_P2_R);// waiting for cars to go up-bottom
+  dayModeTurnOnGreenDiodeAndOffRed(_LE2, LE2_P0_G, LE2_P1_Y, LE2_P2_R); 
 
   delay(2000);
-  dayModeTurnOnGreenDiodeAndOffRed(LE2_P4_G, LE2_P5_Y, LE2_P6_R);
-  dayModeTurnOnGreenDiodeAndOffRed(LE1_P4_G, LE1_P5_Y, LE1_P6_R);
+  dayModeTurnOnRedDiodeAndOffGreen(_LE1, LE1_P0_G, LE1_P1_Y, LE1_P2_R);
+  dayModeTurnOnRedDiodeAndOffGreen(_LE2, LE2_P0_G, LE2_P1_Y, LE2_P2_R);
+
+  dayModeTurnOnGreenZebraCrossControlledByTime(_CE1, CE1_P3_G, CE1_P2_R);
+  dayModeTurnOnGreenZebraCrossControlledByTime(_CE1, CE2_P3_G, CE2_P2_R);
+
+  dayModeTurnOnRedZebraCrossControlledByTime(_CE1, CE1_P1_G, CE1_P0_R);
+  dayModeTurnOnRedZebraCrossControlledByTime(_CE2, CE2_P6_G, CE2_P5_R);
+  dayModeTurnOnRedZebraCrossControlledByTime(_CE2, CE2_P1_G, CE2_P0_R);
+
+  delay(2000);
+  dayModeTurnOnGreenDiodeAndOffRed(_LE1, LE1_P4_G, LE1_P5_Y, LE1_P6_R);
+  dayModeTurnOnGreenDiodeAndOffRed(_LE2, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
 }
 
 void TrafficLight::nightMode()
 {
   if (digitalRead(B1) == LOW)
   {
-    isOnLeftCross = true;
+    _isOnLeftCross = true;
   }
   if (digitalRead(B2) == LOW)
   {
-    isOnBottomCross = true;
+    _isOnBottomCross = true;
   }
-
-  if (isOnLeftCross)
+  if (digitalRead(B3) == LOW)
   {
-    nightModeTurnOnCrossLightAfterButtonClick(CE1_P1_G, CE1_P0_R, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
-    isOnLeftCross = false;
+    _isOnRightCross = true;
   }
 
-  //nightModeTurnOnLightAfterAppropriateDistance(CE1_P3_G, CE1_P2_R, LE2_P0_G, LE2_P1_Y, LE2_P2_R);
+  if (_isOnLeftCross)
+  {
+    nightModeTurnOnCrossLightAfterButtonClick(_CE1, CE1_P1_G, CE1_P0_R, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
+    _isOnLeftCross = false;
+  }
+  if (_isOnBottomCross)
+  {
+    nightModeTurnOnCrossLightAfterButtonClick(_CE2, CE2_P6_G, CE2_P5_R, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
+    _isOnLeftCross = false;
+  }
+  if (_isOnRightCross)
+  {
+    nightModeTurnOnCrossLightAfterButtonClick(_CE2, CE2_P1_G, CE2_P0_R, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
+    _isOnLeftCross = false;
+  }
+
+  nightModeTurnOnLightAfterAppropriateDistance(_CE1, _LE1, CE1_P3_G, CE1_P2_R, LE1_P0_G, LE1_P1_Y, LE1_P2_R, U3_TRIGGER, U3_ECHO, _wasUsedSonar1);
+  nightModeTurnOnLightAfterAppropriateDistance(_CE1, _LE1, CE1_P3_G, CE1_P2_R, LE1_P0_G, LE1_P1_Y, LE1_P2_R, U4_TRIGGER, U4_ECHO, _wasUsedSonar1);
+  nightModeTurnOnLightAfterAppropriateDistance(_CE2, _LE2, CE2_P3_G, CE2_P2_R, LE2_P0_G, LE2_P1_Y, LE2_P2_R, U1_TRIGGER, U1_ECHO, _wasUsedSonar2);
+  nightModeTurnOnLightAfterAppropriateDistance(_CE2, _LE2, CE2_P3_G, CE2_P2_R, LE2_P0_G, LE2_P1_Y, LE2_P2_R, U2_TRIGGER, U2_ECHO, _wasUsedSonar2);
 }
