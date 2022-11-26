@@ -154,40 +154,35 @@ void nightModeTurnOnGreenDiodeAndOffRed(PCF8574 expander, int greenDiode, int ye
   expander.digitalWrite(greenDiode, LOW);
 }
 
-void nightModeTurnOnCrossLightAfterButtonClickAndOffMainStreet(PCF8574 expander, int crossGreenDiode, int crossRedDiode, int lightGreenDiode, int lightYellowDiode, int lightRedDiode)
+void nightModeTurnOnRedLightAndOffGreenOnMainStreet()
 {
   _LE2.digitalWrite(LE2_P4_G, HIGH);
   _LE1.digitalWrite(LE1_P4_G, HIGH);
   _LE2.digitalWrite(LE2_P5_Y, LOW);
-  _LE2.digitalWrite(LE1_P5_Y, LOW);
+  _LE1.digitalWrite(LE1_P5_Y, LOW);
   delay(WAIT_FOR_YELLOW_TIME);
   _LE2.digitalWrite(LE2_P5_Y, HIGH);
-  _LE2.digitalWrite(LE1_P5_Y, HIGH);
+  _LE1.digitalWrite(LE1_P5_Y, HIGH);
   _LE2.digitalWrite(LE2_P6_R, LOW);
   _LE1.digitalWrite(LE1_P6_R, LOW);
+}
 
-  expander.digitalWrite(crossRedDiode, HIGH);
-  expander.digitalWrite(crossGreenDiode, LOW);
-
-  delay(CHANGE_LIGHTS_TIME);
-
-  expander.digitalWrite(crossRedDiode, LOW);
-  expander.digitalWrite(crossGreenDiode, HIGH);
-
+void nightModeTurnOnGreenLightAndOffRedOnMainStreet()
+{
+  _LE2.digitalWrite(LE2_P5_Y, LOW);
+  _LE1.digitalWrite(LE1_P5_Y, LOW);
+  delay(WAIT_FOR_YELLOW_TIME);
   _LE2.digitalWrite(LE2_P6_R, HIGH);
   _LE1.digitalWrite(LE1_P6_R, HIGH);
-  _LE2.digitalWrite(LE2_P5_Y, LOW);
-  _LE2.digitalWrite(LE1_P5_Y, LOW);
-  delay(WAIT_FOR_YELLOW_TIME);
   _LE2.digitalWrite(LE2_P5_Y, HIGH);
-  _LE2.digitalWrite(LE1_P5_Y, HIGH);
+  _LE1.digitalWrite(LE1_P5_Y, HIGH);
   _LE2.digitalWrite(LE2_P4_G, LOW);
   _LE1.digitalWrite(LE1_P4_G, LOW);
 }
 
-bool nightModeTurnOnLightAfterAppropriateDistance(PCF8574 crossExpander, PCF8574 lightExpander, int crossGreenDiode, int crossRedDiode, int lightGreenDiode, int lightYellowDiode, int lightRedDiode, int trigger, int echo, bool wasUsedSonar)
+bool nightModeTurnOnLightAfterAppropriateDistanceForU1(bool wasUsedSonar)
 {
-  int distance = getDistance(trigger, echo);
+  int distance = getDistance(U1_TRIGGER, U1_ECHO);
 
   if (distance == 0)
   {
@@ -195,10 +190,14 @@ bool nightModeTurnOnLightAfterAppropriateDistance(PCF8574 crossExpander, PCF8574
     {
       return wasUsedSonar;
     }
-    crossExpander.digitalWrite(crossRedDiode, LOW);
-    crossExpander.digitalWrite(crossGreenDiode, HIGH);
+    _CE2.digitalWrite(CE2_P2_R, LOW);
+    _CE2.digitalWrite(CE2_P3_G, HIGH);
 
-    nightModeTurnOnGreenDiodeAndOffRed(lightExpander, lightGreenDiode, lightYellowDiode, lightRedDiode);
+    _LE2.digitalWrite(LE2_P1_Y, LOW);
+    delay(WAIT_FOR_YELLOW_TIME);
+    _LE2.digitalWrite(LE2_P2_R, HIGH);
+    _LE2.digitalWrite(LE2_P1_Y, HIGH);
+    _LE2.digitalWrite(LE2_P0_G, LOW);
 
     wasUsedSonar = true;
 
@@ -209,9 +208,138 @@ bool nightModeTurnOnLightAfterAppropriateDistance(PCF8574 crossExpander, PCF8574
   {
     wasUsedSonar = false;
 
-    crossExpander.digitalWrite(crossRedDiode, HIGH);
-    crossExpander.digitalWrite(crossGreenDiode, LOW);
-    nightModeTurnOnRedDiodeAndOffGreen(lightExpander, lightGreenDiode, lightYellowDiode, lightRedDiode);
+    _CE2.digitalWrite(CE2_P2_R, HIGH);
+    _CE2.digitalWrite(CE2_P3_G, LOW);
+    
+    _LE2.digitalWrite(LE2_P0_G, HIGH);
+    _LE2.digitalWrite(LE2_P1_Y, LOW);
+
+    delay(CHANGE_LIGHTS_TIME);
+    _LE2.digitalWrite(LE2_P1_Y, HIGH);
+    _LE2.digitalWrite(LE2_P2_R, LOW);
+  }
+  return wasUsedSonar;
+}
+
+bool nightModeTurnOnLightAfterAppropriateDistanceForU2(bool wasUsedSonar)
+{
+  int distance = getDistance(U2_TRIGGER, U2_ECHO);
+
+  if (distance == 0)
+  {
+    if (wasUsedSonar)
+    {
+      return wasUsedSonar;
+    }
+    _CE2.digitalWrite(CE2_P2_R, LOW);
+    _CE2.digitalWrite(CE2_P3_G, HIGH);
+
+    _LE2.digitalWrite(LE2_P1_Y, LOW);
+    delay(WAIT_FOR_YELLOW_TIME);
+    _LE2.digitalWrite(LE2_P2_R, HIGH);
+    _LE2.digitalWrite(LE2_P1_Y, HIGH);
+    _LE2.digitalWrite(LE2_P0_G, LOW);
+
+    wasUsedSonar = true;
+
+    return wasUsedSonar;
+  }
+
+  if (wasUsedSonar && distance != 0)
+  {
+    wasUsedSonar = false;
+
+    _CE2.digitalWrite(CE2_P2_R, HIGH);
+    _CE2.digitalWrite(CE2_P3_G, LOW);
+    
+    _LE2.digitalWrite(LE2_P0_G, HIGH);
+    _LE2.digitalWrite(LE2_P1_Y, LOW);
+
+    delay(CHANGE_LIGHTS_TIME);
+    _LE2.digitalWrite(LE2_P1_Y, HIGH);
+    _LE2.digitalWrite(LE2_P2_R, LOW);
+  }
+  return wasUsedSonar;
+}
+
+bool nightModeTurnOnLightAfterAppropriateDistanceForU3(bool wasUsedSonar)
+{
+  int distance = getDistance(U3_TRIGGER, U3_ECHO);
+
+  if (distance == 0)
+  {
+    if (wasUsedSonar)
+    {
+      return wasUsedSonar;
+    }
+    _CE1.digitalWrite(CE1_P2_R, LOW);
+    _CE1.digitalWrite(CE1_P3_G, HIGH);
+
+    _LE1.digitalWrite(LE1_P1_Y, LOW);
+    delay(WAIT_FOR_YELLOW_TIME);
+    _LE1.digitalWrite(LE1_P2_R, HIGH);
+    _LE1.digitalWrite(LE1_P1_Y, HIGH);
+    _LE1.digitalWrite(LE1_P0_G, LOW);
+
+    wasUsedSonar = true;
+
+    return wasUsedSonar;
+  }
+
+  if (wasUsedSonar && distance != 0)
+  {
+    wasUsedSonar = false;
+
+    _CE1.digitalWrite(CE1_P2_R, HIGH);
+    _CE1.digitalWrite(CE1_P3_G, LOW);
+    
+    _LE1.digitalWrite(LE1_P0_G, HIGH);
+    _LE1.digitalWrite(LE1_P1_Y, LOW);
+
+    delay(CHANGE_LIGHTS_TIME);
+    _LE1.digitalWrite(LE1_P1_Y, HIGH);
+    _LE1.digitalWrite(LE1_P2_R, LOW);
+  }
+  return wasUsedSonar;
+}
+
+bool nightModeTurnOnLightAfterAppropriateDistanceForU4(bool wasUsedSonar)
+{
+  int distance = getDistance(U4_TRIGGER, U4_ECHO);
+
+  if (distance == 0)
+  {
+    if (wasUsedSonar)
+    {
+      return wasUsedSonar;
+    }
+    _CE1.digitalWrite(CE1_P2_R, LOW);
+    _CE1.digitalWrite(CE1_P3_G, HIGH);
+
+    _LE1.digitalWrite(LE1_P1_Y, LOW);
+    delay(WAIT_FOR_YELLOW_TIME);
+    _LE1.digitalWrite(LE1_P2_R, HIGH);
+    _LE1.digitalWrite(LE1_P1_Y, HIGH);
+    _LE1.digitalWrite(LE1_P0_G, LOW);
+
+    wasUsedSonar = true;
+
+    return wasUsedSonar;
+  }
+
+  if (wasUsedSonar && distance != 0)
+  {
+    wasUsedSonar = false;
+
+    _CE1.digitalWrite(CE1_P2_R, HIGH);
+    _CE1.digitalWrite(CE1_P3_G, LOW);
+    
+    _LE1.digitalWrite(LE1_P0_G, HIGH);
+    _LE1.digitalWrite(LE1_P1_Y, LOW);
+
+    delay(CHANGE_LIGHTS_TIME);
+    _LE1.digitalWrite(LE1_P1_Y, HIGH);
+    _LE1.digitalWrite(LE1_P2_R, LOW);
   }
   return wasUsedSonar;
 }
@@ -395,22 +523,49 @@ void TrafficLight::nightMode()
 
   if (_isOnLeftCross)
   {
-    nightModeTurnOnCrossLightAfterButtonClickAndOffMainStreet(_CE1, CE1_P1_G, CE1_P0_R, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
+    nightModeTurnOnRedLightAndOffGreenOnMainStreet();
+    _CE1.digitalWrite(CE1_P0_R, HIGH);
+    _CE1.digitalWrite(CE1_P1_G, LOW);
+
+    delay(CHANGE_LIGHTS_TIME);
+
+    _CE1.digitalWrite(CE1_P0_R, LOW);
+    _CE1.digitalWrite(CE1_P1_G, HIGH);
+    nightModeTurnOnGreenLightAndOffRedOnMainStreet();
+
     _isOnLeftCross = false;
   }
   if (_isOnBottomCross)
   {
-    nightModeTurnOnCrossLightAfterButtonClickAndOffMainStreet(_CE2, CE2_P6_G, CE2_P5_R, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
+    nightModeTurnOnRedLightAndOffGreenOnMainStreet();
+    _CE2.digitalWrite(CE2_P5_R, HIGH);
+    _CE2.digitalWrite(CE2_P6_G, LOW);
+
+    delay(CHANGE_LIGHTS_TIME);
+
+    _CE2.digitalWrite(CE2_P5_R, LOW);
+    _CE2.digitalWrite(CE2_P6_G, HIGH);
+    nightModeTurnOnGreenLightAndOffRedOnMainStreet();
+
     _isOnBottomCross = false;
   }
   if (_isOnRightCross)
   {
-    nightModeTurnOnCrossLightAfterButtonClickAndOffMainStreet(_CE2, CE2_P1_G, CE2_P0_R, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
+    nightModeTurnOnRedLightAndOffGreenOnMainStreet();
+    _CE2.digitalWrite(CE2_P0_R, HIGH);
+    _CE2.digitalWrite(CE2_P1_G, LOW);
+
+    delay(CHANGE_LIGHTS_TIME);
+
+    _CE2.digitalWrite(CE2_P0_R, LOW);
+    _CE2.digitalWrite(CE2_P1_G, HIGH);
+    nightModeTurnOnGreenLightAndOffRedOnMainStreet();
+
     _isOnRightCross = false;
   }
 
-  _wasUsedSonar1 = nightModeTurnOnLightAfterAppropriateDistance(_CE2, _LE2, CE2_P3_G, CE2_P2_R, LE2_P0_G, LE2_P1_Y, LE2_P2_R, U1_TRIGGER, U1_ECHO, _wasUsedSonar1);
-  _wasUsedSonar2 = nightModeTurnOnLightAfterAppropriateDistance(_CE2, _LE2, CE2_P3_G, CE2_P2_R, LE2_P0_G, LE2_P1_Y, LE2_P2_R, U2_TRIGGER, U2_ECHO, _wasUsedSonar2);
-  _wasUsedSonar3 = nightModeTurnOnLightAfterAppropriateDistance(_CE1, _LE1, CE1_P3_G, CE1_P2_R, LE1_P0_G, LE1_P1_Y, LE1_P2_R, U3_TRIGGER, U3_ECHO, _wasUsedSonar3);
-  _wasUsedSonar4 = nightModeTurnOnLightAfterAppropriateDistance(_CE1, _LE1, CE1_P3_G, CE1_P2_R, LE1_P0_G, LE1_P1_Y, LE1_P2_R, U4_TRIGGER, U4_ECHO, _wasUsedSonar4);
+  _wasUsedSonar1 = nightModeTurnOnLightAfterAppropriateDistanceForU1(_wasUsedSonar1);
+  _wasUsedSonar2 = nightModeTurnOnLightAfterAppropriateDistanceForU2(_wasUsedSonar2);
+  _wasUsedSonar3 = nightModeTurnOnLightAfterAppropriateDistanceForU3(_wasUsedSonar3);
+  _wasUsedSonar4 = nightModeTurnOnLightAfterAppropriateDistanceForU4(_wasUsedSonar4);
 }
