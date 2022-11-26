@@ -54,6 +54,9 @@ const int LIGHT_EXPANDER2_DIODES[] = {LE2_P6_R, LE2_P5_Y, LE2_P4_G, LE2_P2_R, LE
 const int CROSS_EXPANDER2_DIODES[] = {CE2_P0_R, CE2_P1_G, CE2_P2_R, CE2_P3_G, CE2_P5_R, CE2_P6_G};
 const int LIGHT_EXPANDER1_DIODES[] = {LE1_P6_R, LE1_P5_Y, LE1_P4_G, LE1_P2_R, LE1_P1_Y, LE1_P0_G};
 
+const int CHANGE_LIGHTS_TIME = 2000;
+const int WAIT_FOR_YELLOW_TIME = 500;
+
 bool _wasUsedSonar1 = false;
 bool _wasUsedSonar2 = false;
 bool _wasUsedSonar3 = false;
@@ -137,18 +140,16 @@ void nightModeTurnOnRedDiodeAndOffGreen(PCF8574 expander, int greenDiode, int ye
   expander.digitalWrite(greenDiode, HIGH);
 
   expander.digitalWrite(yellowDiode, LOW);
-  delay(2000);
+  delay(CHANGE_LIGHTS_TIME);
   expander.digitalWrite(yellowDiode, HIGH);
   expander.digitalWrite(redDiode, LOW);
 }
 
 void nightModeTurnOnGreenDiodeAndOffRed(PCF8574 expander, int greenDiode, int yellowDiode, int redDiode)
 {
-
-  expander.digitalWrite(redDiode, HIGH);
   expander.digitalWrite(yellowDiode, LOW);
-  delay(500);
-
+  delay(WAIT_FOR_YELLOW_TIME);
+  expander.digitalWrite(redDiode, HIGH);
   expander.digitalWrite(yellowDiode, HIGH);
   expander.digitalWrite(greenDiode, LOW);
 }
@@ -159,7 +160,7 @@ void nightModeTurnOnCrossLightAfterButtonClickAndOffMainStreet(PCF8574 expander,
   _LE1.digitalWrite(LE1_P4_G, HIGH);
   _LE2.digitalWrite(LE2_P5_Y, LOW);
   _LE2.digitalWrite(LE1_P5_Y, LOW);
-  delay(500);
+  delay(WAIT_FOR_YELLOW_TIME);
   _LE2.digitalWrite(LE2_P5_Y, HIGH);
   _LE2.digitalWrite(LE1_P5_Y, HIGH);
   _LE2.digitalWrite(LE2_P6_R, LOW);
@@ -168,7 +169,7 @@ void nightModeTurnOnCrossLightAfterButtonClickAndOffMainStreet(PCF8574 expander,
   expander.digitalWrite(crossRedDiode, HIGH);
   expander.digitalWrite(crossGreenDiode, LOW);
 
-  delay(5000);
+  delay(CHANGE_LIGHTS_TIME);
 
   expander.digitalWrite(crossRedDiode, LOW);
   expander.digitalWrite(crossGreenDiode, HIGH);
@@ -177,7 +178,7 @@ void nightModeTurnOnCrossLightAfterButtonClickAndOffMainStreet(PCF8574 expander,
   _LE1.digitalWrite(LE1_P6_R, HIGH);
   _LE2.digitalWrite(LE2_P5_Y, LOW);
   _LE2.digitalWrite(LE1_P5_Y, LOW);
-  delay(500);
+  delay(WAIT_FOR_YELLOW_TIME);
   _LE2.digitalWrite(LE2_P5_Y, HIGH);
   _LE2.digitalWrite(LE1_P5_Y, HIGH);
   _LE2.digitalWrite(LE2_P4_G, LOW);
@@ -215,41 +216,107 @@ bool nightModeTurnOnLightAfterAppropriateDistance(PCF8574 crossExpander, PCF8574
   return wasUsedSonar;
 }
 
-void dayModeTurnOnGreenDiodeAndOffRed(PCF8574 expander, int greenDiode, int yellowDiode, int redDiode)
+void dayModeTurnOnGreenZebraCrossAndOffRedOnMainRoad()
 {
-  expander.digitalWrite(redDiode, HIGH);
-  expander.digitalWrite(yellowDiode, LOW);
-  delay(500);
-
-  expander.digitalWrite(yellowDiode, HIGH);
-  expander.digitalWrite(greenDiode, LOW);
+  _CE1.digitalWrite(CE1_P0_R, HIGH);
+  _CE1.digitalWrite(CE1_P1_G, LOW);
+  delay(100);
+  _CE2.digitalWrite(CE2_P5_R, HIGH);
+  _CE2.digitalWrite(CE2_P6_G, LOW);
+  delay(100);
+  _CE2.digitalWrite(CE2_P0_R, HIGH);
+  _CE2.digitalWrite(CE2_P1_G, LOW);
 }
 
-void dayModeTurnOnRedDiodeAndOffGreen(PCF8574 expander, int greenDiode, int yellowDiode, int redDiode)
+void dayModeTurnOnRedZebraCrossAndOffGreenOnSuboRoad()
 {
-  expander.digitalWrite(greenDiode, HIGH);
-  delay(200);
-
-  expander.digitalWrite(yellowDiode, LOW);
-  delay(2000);
-  expander.digitalWrite(yellowDiode, HIGH);
-  expander.digitalWrite(redDiode, LOW);
+  _CE1.digitalWrite(CE1_P3_G, HIGH);
+  _CE1.digitalWrite(CE1_P2_R, LOW);
+  
+  _CE2.digitalWrite(CE2_P3_G, HIGH);
+  _CE2.digitalWrite(CE2_P2_R, LOW);
 }
 
-void dayModeTurnOnRedZebraCrossControlledByTime(PCF8574 expander, int greenDiode, int redDiode)
+void dayModeTurnOnRedLightAndOffGreenOnMainRoad()
 {
-  expander.digitalWrite(greenDiode, HIGH);
-  expander.digitalWrite(redDiode, LOW);
+  _LE1.digitalWrite(LE1_P4_G, HIGH);
+  _LE1.digitalWrite(LE1_P5_Y, LOW);
+  delay(CHANGE_LIGHTS_TIME);
+  _LE1.digitalWrite(LE1_P5_Y, HIGH);
+  _LE1.digitalWrite(LE1_P6_R, LOW);
 
-  return;
+  _LE2.digitalWrite(LE2_P4_G, HIGH);
+  _LE2.digitalWrite(LE2_P5_Y, LOW);
+  delay(CHANGE_LIGHTS_TIME);
+  _LE2.digitalWrite(LE2_P5_Y, HIGH);
+  _LE2.digitalWrite(LE2_P6_R, LOW);
 }
 
-void dayModeTurnOnGreenZebraCrossControlledByTime(PCF8574 expander, int greenDiode, int redDiode)
+void dayModeTurnOnGreenAndOffRedOnSuboRoad()
 {
-  expander.digitalWrite(redDiode, HIGH);
-  expander.digitalWrite(greenDiode, LOW);
+  _LE1.digitalWrite(LE1_P1_Y, LOW);
+  delay(WAIT_FOR_YELLOW_TIME);
 
-  return;
+  _LE1.digitalWrite(LE1_P2_R, HIGH);
+  _LE1.digitalWrite(LE1_P1_Y, HIGH);
+  _LE1.digitalWrite(LE1_P0_G, LOW);
+  _LE2.digitalWrite(LE2_P1_Y, LOW);
+  delay(WAIT_FOR_YELLOW_TIME);
+
+  _LE2.digitalWrite(LE2_P2_R, HIGH);
+  _LE2.digitalWrite(LE2_P1_Y, HIGH);
+  _LE2.digitalWrite(LE2_P0_G, LOW);
+}
+
+void dayModeTurnOnRedZebraCrossAndOffGreenOnMainRoad()
+{
+  _CE1.digitalWrite(CE1_P2_R, HIGH);
+  _CE1.digitalWrite(CE1_P3_G, LOW);
+
+  _CE2.digitalWrite(CE2_P2_R, HIGH);
+  _CE2.digitalWrite(CE2_P3_G, LOW);
+}
+
+void dayModeTurnOnGreenAndOffReadZebraCrossOnSuboRoad()
+{
+  _CE1.digitalWrite(CE1_P1_G, HIGH);
+  _CE1.digitalWrite(CE1_P0_R, LOW);
+
+  _CE2.digitalWrite(CE2_P6_G, HIGH);
+  _CE2.digitalWrite(CE2_P5_R, LOW);
+
+  _CE2.digitalWrite(CE2_P1_G, HIGH);
+  _CE2.digitalWrite(CE2_P0_R, LOW);
+}
+
+void dayModeTurnOnGreenAndOffRedLightsOnMainRoad()
+{
+  _LE1.digitalWrite(LE1_P5_Y, LOW);
+  delay(WAIT_FOR_YELLOW_TIME);
+  _LE1.digitalWrite(LE1_P6_R, HIGH);
+  _LE1.digitalWrite(LE1_P5_Y, HIGH);
+  _LE1.digitalWrite(LE1_P4_G, LOW);
+  
+  _LE2.digitalWrite(LE2_P5_Y, LOW);
+  delay(WAIT_FOR_YELLOW_TIME);
+  _LE2.digitalWrite(LE2_P6_R, HIGH);
+  _LE2.digitalWrite(LE2_P5_Y, HIGH);
+  _LE2.digitalWrite(LE2_P4_G, LOW);
+}
+
+void dayModeTurnOnRedDiodeAndOffGreenOnSuboRoad()
+{
+  _LE1.digitalWrite(LE1_P0_G, HIGH);
+  _LE1.digitalWrite(LE1_P1_Y, LOW);
+  delay(WAIT_FOR_YELLOW_TIME);
+  _LE1.digitalWrite(LE1_P1_Y, HIGH);
+  _LE1.digitalWrite(LE1_P2_R, LOW);
+  
+  _LE2.digitalWrite(LE2_P0_G, HIGH);
+  _LE2.digitalWrite(LE2_P1_Y, LOW);
+  delay(WAIT_FOR_YELLOW_TIME);
+  _LE2.digitalWrite(LE2_P1_Y, HIGH);
+  _LE2.digitalWrite(LE2_P2_R, LOW);
 }
 
 void TrafficLight::setNightModeStartParameters()
@@ -286,42 +353,27 @@ void TrafficLight::setDayModeStartParameters()
 
   // setting center zebra cross
   _CE2.digitalWrite(CE2_P5_R, LOW);
-  _CE2.digitalWrite(CE2_P6_G, LOW);
-
 }
 
 void TrafficLight::dayMode()
 {
-  delay(2000); // waiting for cars to go left-right
-  dayModeTurnOnRedDiodeAndOffGreen(_LE1, LE1_P4_G, LE1_P5_Y, LE1_P6_R);
-  dayModeTurnOnRedDiodeAndOffGreen(_LE2, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
+  delay(CHANGE_LIGHTS_TIME);
+  dayModeTurnOnRedLightAndOffGreenOnMainRoad();
+  dayModeTurnOnGreenZebraCrossAndOffRedOnMainRoad();
 
-  // turn on zebra lights
-  dayModeTurnOnGreenZebraCrossControlledByTime(_CE1, CE1_P1_G, CE1_P0_R);
-  dayModeTurnOnGreenZebraCrossControlledByTime(_CE2, CE2_P6_G, CE2_P5_R);
-  dayModeTurnOnGreenZebraCrossControlledByTime(_CE2, CE2_P1_G, CE2_P0_R);
+  delay(CHANGE_LIGHTS_TIME);
+  dayModeTurnOnRedZebraCrossAndOffGreenOnSuboRoad();
 
-  dayModeTurnOnRedZebraCrossControlledByTime(_CE1, CE1_P3_G, CE1_P2_R);
-  dayModeTurnOnRedZebraCrossControlledByTime(_CE2, CE2_P3_G, CE2_P2_R);
+  delay(CHANGE_LIGHTS_TIME);
+  dayModeTurnOnGreenAndOffRedOnSuboRoad();
 
-  delay(2000);
-  dayModeTurnOnGreenDiodeAndOffRed(_LE1, LE1_P0_G, LE1_P1_Y, LE1_P2_R);// waiting for cars to go up-bottom
-  dayModeTurnOnGreenDiodeAndOffRed(_LE2, LE2_P0_G, LE2_P1_Y, LE2_P2_R); 
+  delay(CHANGE_LIGHTS_TIME);
+  dayModeTurnOnRedDiodeAndOffGreenOnSuboRoad();
+  dayModeTurnOnRedZebraCrossAndOffGreenOnMainRoad();
+  dayModeTurnOnGreenAndOffReadZebraCrossOnSuboRoad();
 
-  delay(2000);
-  dayModeTurnOnRedDiodeAndOffGreen(_LE1, LE1_P0_G, LE1_P1_Y, LE1_P2_R);
-  dayModeTurnOnRedDiodeAndOffGreen(_LE2, LE2_P0_G, LE2_P1_Y, LE2_P2_R);
-
-  dayModeTurnOnGreenZebraCrossControlledByTime(_CE1, CE1_P3_G, CE1_P2_R);
-  dayModeTurnOnGreenZebraCrossControlledByTime(_CE1, CE2_P3_G, CE2_P2_R);
-
-  dayModeTurnOnRedZebraCrossControlledByTime(_CE1, CE1_P1_G, CE1_P0_R);
-  dayModeTurnOnRedZebraCrossControlledByTime(_CE2, CE2_P6_G, CE2_P5_R);
-  dayModeTurnOnRedZebraCrossControlledByTime(_CE2, CE2_P1_G, CE2_P0_R);
-
-  delay(2000);
-  dayModeTurnOnGreenDiodeAndOffRed(_LE1, LE1_P4_G, LE1_P5_Y, LE1_P6_R);
-  dayModeTurnOnGreenDiodeAndOffRed(_LE2, LE2_P4_G, LE2_P5_Y, LE2_P6_R);
+  delay(CHANGE_LIGHTS_TIME);
+  dayModeTurnOnGreenAndOffRedLightsOnMainRoad();
 }
 
 void TrafficLight::nightMode()

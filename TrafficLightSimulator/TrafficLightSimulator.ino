@@ -15,6 +15,8 @@ bool _shouldBeStartUpParams;
 bool _isDayMode = false;
 bool _lastState;
 
+//int switchHelper[500];
+
 void setup()
 {
   CE1.begin(0x20); //CE1
@@ -43,12 +45,50 @@ void setup()
 
 void loop()
 {
-  if (_isDayMode)
-  {
-    _traffic.dayMode();
-  }
-  else
-  {
-    _traffic.nightMode();
-  }
+  //Serial.println(digitalRead(TOGGLE_MODE));
+//  int sum = 0;
+
+//  for(int i = 0; i < 500; i++)
+//  {
+//    //Serial.println(digitalRead(TOGGLE_MODE));
+//    switchHelper[i] = digitalRead(TOGGLE_MODE);
+//  }
+
+//  for(int i = 0; i < 500; i++)
+//  {  
+//    sum += switchHelper[i];
+
+//    if(sum > 0)
+//    {
+//      _isDayMode = true;
+//    }
+//    else
+//    {
+//      _isDayMode = false;
+//    }
+//  }
+
+//  for(int i = 0; i < 500; i++)
+//  {
+//    switchHelper[i] = 0;
+//  }
+ 
+
+//  if(_isDayMode)
+//  {
+//    Serial.println("tryb dzien");
+//  }
+//  else
+//  {
+//    Serial.println("tryb noc");
+//  }
+  
+   if (_isDayMode)
+   {
+     _traffic.dayMode();
+   }
+   else
+   {
+     _traffic.nightMode();
+   }
 }
