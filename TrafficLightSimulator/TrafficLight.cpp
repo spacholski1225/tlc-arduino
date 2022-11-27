@@ -194,7 +194,17 @@ bool nightModeTurnOnLightAfterAppropriateDistanceForU1(bool wasUsedSonar)
     _CE2.digitalWrite(CE2_P3_G, HIGH);
 
     _LE2.digitalWrite(LE2_P1_Y, LOW);
+
+    _LE1.digitalWrite(LE1_P5_Y, LOW);
+    _LE1.digitalWrite(LE1_P4_G, HIGH);
+    _LE2.digitalWrite(LE2_P5_Y, LOW);
+    _LE2.digitalWrite(LE2_P4_G, HIGH);
     delay(WAIT_FOR_YELLOW_TIME);
+    _LE1.digitalWrite(LE1_P5_Y, HIGH);
+    _LE1.digitalWrite(LE1_P6_R, LOW);
+    _LE2.digitalWrite(LE2_P5_Y, HIGH);
+    _LE2.digitalWrite(LE2_P6_R, LOW);
+
     _LE2.digitalWrite(LE2_P2_R, HIGH);
     _LE2.digitalWrite(LE2_P1_Y, HIGH);
     _LE2.digitalWrite(LE2_P0_G, LOW);
@@ -214,7 +224,18 @@ bool nightModeTurnOnLightAfterAppropriateDistanceForU1(bool wasUsedSonar)
     _LE2.digitalWrite(LE2_P0_G, HIGH);
     _LE2.digitalWrite(LE2_P1_Y, LOW);
 
+    _LE1.digitalWrite(LE1_P5_Y, LOW);
+    _LE2.digitalWrite(LE2_P5_Y, LOW);
+
     delay(CHANGE_LIGHTS_TIME);
+
+    _LE1.digitalWrite(LE1_P5_Y, HIGH);
+    _LE2.digitalWrite(LE2_P5_Y, HIGH);
+    _LE1.digitalWrite(LE1_P6_R, HIGH);
+    _LE2.digitalWrite(LE2_P6_R, HIGH);
+    _LE1.digitalWrite(LE1_P4_G, LOW);
+    _LE2.digitalWrite(LE2_P4_G, LOW);
+
     _LE2.digitalWrite(LE2_P1_Y, HIGH);
     _LE2.digitalWrite(LE2_P2_R, LOW);
   }
@@ -235,7 +256,17 @@ bool nightModeTurnOnLightAfterAppropriateDistanceForU2(bool wasUsedSonar)
     _CE2.digitalWrite(CE2_P3_G, HIGH);
 
     _LE2.digitalWrite(LE2_P1_Y, LOW);
+
+    _LE1.digitalWrite(LE1_P5_Y, LOW);
+    _LE1.digitalWrite(LE1_P4_G, HIGH);
+    _LE2.digitalWrite(LE2_P5_Y, LOW);
+    _LE2.digitalWrite(LE2_P4_G, HIGH);
     delay(WAIT_FOR_YELLOW_TIME);
+    _LE1.digitalWrite(LE1_P5_Y, HIGH);
+    _LE1.digitalWrite(LE1_P6_R, LOW);
+    _LE2.digitalWrite(LE2_P5_Y, HIGH);
+    _LE2.digitalWrite(LE2_P6_R, LOW);
+
     _LE2.digitalWrite(LE2_P2_R, HIGH);
     _LE2.digitalWrite(LE2_P1_Y, HIGH);
     _LE2.digitalWrite(LE2_P0_G, LOW);
@@ -255,7 +286,18 @@ bool nightModeTurnOnLightAfterAppropriateDistanceForU2(bool wasUsedSonar)
     _LE2.digitalWrite(LE2_P0_G, HIGH);
     _LE2.digitalWrite(LE2_P1_Y, LOW);
 
+    _LE1.digitalWrite(LE1_P5_Y, LOW);
+    _LE2.digitalWrite(LE2_P5_Y, LOW);
+
     delay(CHANGE_LIGHTS_TIME);
+
+    _LE1.digitalWrite(LE1_P5_Y, HIGH);
+    _LE2.digitalWrite(LE2_P5_Y, HIGH);
+    _LE1.digitalWrite(LE1_P6_R, HIGH);
+    _LE2.digitalWrite(LE2_P6_R, HIGH);
+    _LE1.digitalWrite(LE1_P4_G, LOW);
+    _LE2.digitalWrite(LE2_P4_G, LOW);
+
     _LE2.digitalWrite(LE2_P1_Y, HIGH);
     _LE2.digitalWrite(LE2_P2_R, LOW);
   }
@@ -272,11 +314,22 @@ bool nightModeTurnOnLightAfterAppropriateDistanceForU3(bool wasUsedSonar)
     {
       return wasUsedSonar;
     }
-    _CE1.digitalWrite(CE1_P2_R, LOW);
-    _CE1.digitalWrite(CE1_P3_G, HIGH);
+
+    _CE1.digitalWrite(CE2_P2_R, LOW);
+    _CE1.digitalWrite(CE2_P3_G, HIGH);
 
     _LE1.digitalWrite(LE1_P1_Y, LOW);
+
+    _LE1.digitalWrite(LE1_P5_Y, LOW);
+    _LE1.digitalWrite(LE1_P4_G, HIGH);
+    _LE2.digitalWrite(LE2_P5_Y, LOW);
+    _LE2.digitalWrite(LE2_P4_G, HIGH);
     delay(WAIT_FOR_YELLOW_TIME);
+    _LE1.digitalWrite(LE1_P5_Y, HIGH);
+    _LE1.digitalWrite(LE1_P6_R, LOW);
+    _LE2.digitalWrite(LE2_P5_Y, HIGH);
+    _LE2.digitalWrite(LE2_P6_R, LOW);
+
     _LE1.digitalWrite(LE1_P2_R, HIGH);
     _LE1.digitalWrite(LE1_P1_Y, HIGH);
     _LE1.digitalWrite(LE1_P0_G, LOW);
@@ -290,13 +343,24 @@ bool nightModeTurnOnLightAfterAppropriateDistanceForU3(bool wasUsedSonar)
   {
     wasUsedSonar = false;
 
-    _CE1.digitalWrite(CE1_P2_R, HIGH);
-    _CE1.digitalWrite(CE1_P3_G, LOW);
+    _CE1.digitalWrite(CE2_P2_R, HIGH);
+    _CE1.digitalWrite(CE2_P3_G, LOW);
     
     _LE1.digitalWrite(LE1_P0_G, HIGH);
     _LE1.digitalWrite(LE1_P1_Y, LOW);
 
+    _LE1.digitalWrite(LE1_P5_Y, LOW);
+    _LE2.digitalWrite(LE2_P5_Y, LOW);
+
     delay(CHANGE_LIGHTS_TIME);
+
+    _LE1.digitalWrite(LE1_P5_Y, HIGH);
+    _LE2.digitalWrite(LE2_P5_Y, HIGH);
+    _LE1.digitalWrite(LE1_P6_R, HIGH);
+    _LE2.digitalWrite(LE2_P6_R, HIGH);
+    _LE1.digitalWrite(LE1_P4_G, LOW);
+    _LE2.digitalWrite(LE2_P4_G, LOW);
+
     _LE1.digitalWrite(LE1_P1_Y, HIGH);
     _LE1.digitalWrite(LE1_P2_R, LOW);
   }
@@ -313,11 +377,21 @@ bool nightModeTurnOnLightAfterAppropriateDistanceForU4(bool wasUsedSonar)
     {
       return wasUsedSonar;
     }
-    _CE1.digitalWrite(CE1_P2_R, LOW);
-    _CE1.digitalWrite(CE1_P3_G, HIGH);
+    _CE1.digitalWrite(CE2_P2_R, LOW);
+    _CE1.digitalWrite(CE2_P3_G, HIGH);
 
     _LE1.digitalWrite(LE1_P1_Y, LOW);
+
+    _LE1.digitalWrite(LE1_P5_Y, LOW);
+    _LE1.digitalWrite(LE1_P4_G, HIGH);
+    _LE2.digitalWrite(LE2_P5_Y, LOW);
+    _LE2.digitalWrite(LE2_P4_G, HIGH);
     delay(WAIT_FOR_YELLOW_TIME);
+    _LE1.digitalWrite(LE1_P5_Y, HIGH);
+    _LE1.digitalWrite(LE1_P6_R, LOW);
+    _LE2.digitalWrite(LE2_P5_Y, HIGH);
+    _LE2.digitalWrite(LE2_P6_R, LOW);
+
     _LE1.digitalWrite(LE1_P2_R, HIGH);
     _LE1.digitalWrite(LE1_P1_Y, HIGH);
     _LE1.digitalWrite(LE1_P0_G, LOW);
@@ -331,13 +405,24 @@ bool nightModeTurnOnLightAfterAppropriateDistanceForU4(bool wasUsedSonar)
   {
     wasUsedSonar = false;
 
-    _CE1.digitalWrite(CE1_P2_R, HIGH);
-    _CE1.digitalWrite(CE1_P3_G, LOW);
+    _CE1.digitalWrite(CE2_P2_R, HIGH);
+    _CE1.digitalWrite(CE2_P3_G, LOW);
     
     _LE1.digitalWrite(LE1_P0_G, HIGH);
     _LE1.digitalWrite(LE1_P1_Y, LOW);
 
+    _LE1.digitalWrite(LE1_P5_Y, LOW);
+    _LE2.digitalWrite(LE2_P5_Y, LOW);
+
     delay(CHANGE_LIGHTS_TIME);
+
+    _LE1.digitalWrite(LE1_P5_Y, HIGH);
+    _LE2.digitalWrite(LE2_P5_Y, HIGH);
+    _LE1.digitalWrite(LE1_P6_R, HIGH);
+    _LE2.digitalWrite(LE2_P6_R, HIGH);
+    _LE1.digitalWrite(LE1_P4_G, LOW);
+    _LE2.digitalWrite(LE2_P4_G, LOW);
+
     _LE1.digitalWrite(LE1_P1_Y, HIGH);
     _LE1.digitalWrite(LE1_P2_R, LOW);
   }
