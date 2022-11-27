@@ -2,46 +2,71 @@
 #include "TrafficLight.h"
 #include "PCF8574.h"
 
+#define TOGGLE_MODE 9
 
-PCF8574 crossExpander;
-PCF8574 lightExpander;
-PCF8574 crossExpander2;
-PCF8574 lightExpander2;
+const int TIME_TO_SETUP = 1000;
 
-TrafficLight traffic;
+PCF8574 CE1;
+PCF8574 LE2;
+PCF8574 CE2;
+PCF8574 LE1;
 
-bool isDayMode = true;
+TrafficLight _traffic;
+
+bool _shouldBeStartUpParams;
+bool _isDayMode = false;
+bool _lastState;
 
 void setup()
 {
-  crossExpander.begin(0x20);
-  lightExpander.begin(0x21);
-  crossExpander2.begin(0x22);
-  lightExpander2.begin(0x24);
+  CE1.begin(0x20);
+  LE2.begin(0x24);
+  CE2.begin(0x22);
+  LE1.begin(0x21);
 
-  Serial.begin(9600);
+  pinMode(TOGGLE_MODE, INPUT_PULLUP);
 
-  if (isDayMode) // to change cuz it run only once time, so always will execute setdDayModeStartParameters()
+  _isDayMode = digitalRead(TOGGLE_MODE) == LOW;
+
+  if(_isDayMode)
   {
-    traffic.setUpTrafficLight(crossExpander, lightExpander, crossExpander2, lightExpander2);
-    traffic.setDayModeStartParameters();
+    _traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+    _traffic.setDayModeStartParameters();
   }
+
   else
   {
-    traffic.setUpTrafficLight(crossExpander, lightExpander, crossExpander2, lightExpander2);
-    //traffic.setUpTrafficLight(crossExpander2, lightExpander2);
-    traffic.setNightModeStartParameters();
+   _traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+   _traffic.setNightModeStartParameters();
   }
 }
 
 void loop()
 {
-  if (isDayMode)
+  _lastState = _isDayMode;
+  _isDayMode = digitalRead(TOGGLE_MODE);
+
+  if(_isDayMode)
   {
-    traffic.dayMode();
+    if(!_lastState && _isDayMode)
+    {
+      _traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+      _traffic.setDayModeStartParameters(); 
+      _shouldBeStartUpParams = false;
+      delay(TIME_TO_SETUP);
+    }
+    _traffic.dayMode();
   }
   else
   {
-    traffic.nightMode();
+    if(_lastState && !_isDayMode)
+    {
+      _traffic.setUpTrafficLight(CE1, LE2, CE2, LE1);
+      _traffic.setNightModeStartParameters();
+
+      _shouldBeStartUpParams = false;
+      delay(TIME_TO_SETUP);
+    }
+    _traffic.nightMode();
   }
 }
