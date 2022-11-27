@@ -26,7 +26,7 @@ void setup()
 
   Serial.begin(9600);
 
-  pinMode(TOGGLE_MODE, INPUT);
+  pinMode(TOGGLE_MODE, INPUT_PULLUP);
 
   //_isDayMode = digitalRead(TOGGLE_MODE) == HIGH;
 
@@ -45,7 +45,7 @@ void setup()
 
 void loop()
 {
-  //Serial.println(digitalRead(TOGGLE_MODE));
+  Serial.println(digitalRead(TOGGLE_MODE));
 //  int sum = 0;
 
 //  for(int i = 0; i < 500; i++)
@@ -83,12 +83,12 @@ void loop()
 //    Serial.println("tryb noc");
 //  }
   
-   if (_isDayMode)
-   {
-     _traffic.dayMode();
-   }
-   else
-   {
-     _traffic.nightMode();
-   }
+//   if (_isDayMode)
+//   {
+//     _traffic.dayMode();
+//   }
+//   else
+//   {
+//     _traffic.nightMode();
+//   }
 }
